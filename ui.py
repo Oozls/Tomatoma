@@ -1,10 +1,20 @@
 # -*- coding:utf-8 -*-
+# PyQt5로 Ui 구동하는 코드임
 
 from PyQt5 import QtWidgets, uic
 import os
 
+# 기타 코드 클래스 임포트
+from tests import Tests
+
+
+
 class Ui(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi("./resources/ui/main.ui")
-        self.show()
+    def __init__(self, path): # 초기 실행
+        print("Tomatoma(ui.py->Ui): Ui 클래스 Init")
+        super(Ui, self).__init__()
+        uic.loadUi("./resources/ui/main.ui", self) # main.ui 불러오기
+
+        Tests.add()
+
+        self.show() # 불러온 ui 보여주기

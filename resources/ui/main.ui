@@ -17,8 +17,25 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton, QLabel, QLineEdit {
+   <string notr="true">QPushButton, QLabel, QLineEdit, QTextEdit, QComboBox, QDateEdit, QTimeEdit {
 	font-family: 'Noto Sans KR';
+}
+
+QLineEdit, QTextEdit, QComboBox, QDateEdit, QTimeEdit {
+	border: 1px solid rgba(185, 185, 185, 100);
+	border-radius: 5px;
+}
+
+QDateEdit::drop-down, QComboBox::drop-down {
+	background-color: #a9cb6a;
+	border: 1px solid rgba(185, 185, 185, 100);
+	border-radius: 5px;
+}
+
+QTimeEdit::up-button, QTimeEdit::down-button {
+	background-color: #a9cb6a;
+	border: 1px solid rgba(185, 185, 185, 100);
+	border-radius: 3px;
 }
 
 QMainWindow, QWidget#centralwidget {
@@ -296,7 +313,7 @@ QPushButton::hover {
        <item>
         <widget class="QStackedWidget" name="mainContainer">
          <property name="styleSheet">
-          <string notr="true">QWidget#homePage, QWidget#testsPage {
+          <string notr="true">QWidget#homePage, QWidget#testsPage, QWidget#testsAddPage {
 	background-color: #fefbfb;
 	border-bottom-right-radius: 10px;
 }</string>
@@ -448,21 +465,16 @@ QPushButton::hover {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton#testAddBtn {
+              <string notr="true">QPushButton#testsAddEnterBtn {
 	background-color: #a9cb6a;
-	border: none;
+	border: 1px solid rgba(185, 185, 185, 100);
 	border-radius: 10px;
 	padding: 5px 15px 5px 15px;
-}
-
-QLineEdit {
-	border: 1px solid rgba(185, 185, 185, 100);
-	border-radius: 5px;
 }</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="testAddBtn">
+               <widget class="QPushButton" name="testsAddEnterBtn">
                 <property name="font">
                  <font>
                   <family>Noto Sans KR</family>
@@ -494,7 +506,7 @@ QLineEdit {
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit"/>
+               <widget class="QLineEdit" name="testsSearchInput"/>
               </item>
              </layout>
             </widget>
@@ -513,16 +525,338 @@ QLineEdit {
                 <property name="widgetResizable">
                  <bool>true</bool>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
                 <widget class="QWidget" name="testsScrollAreaContainer">
                  <property name="geometry">
                   <rect>
                    <x>0</x>
                    <y>0</y>
                    <width>885</width>
-                   <height>544</height>
+                   <height>542</height>
                   </rect>
                  </property>
+                 <widget class="QWidget" name="testsSearchSample" native="true">
+                  <property name="geometry">
+                   <rect>
+                    <x>9</x>
+                    <y>9</y>
+                    <width>871</width>
+                    <height>126</height>
+                   </rect>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QWidget{
+	background-color: #fefbfb;
+	border-radius: 5px;
+	border: 1px solid rgba(185, 185, 185, 100);
+}</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="testsSearchName">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Noto Sans KR</family>
+                       <pointsize>20</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>이름</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="testsSearchSubject">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Noto Sans KR</family>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>과목</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="testsSearchDateTime">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>시간</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="testsSearchDesc">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>100</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>설명</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="label_11">
+                     <property name="font">
+                      <font>
+                       <family>Noto Sans KR</family>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>남은 시간</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="testsAddPage">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QWidget" name="testsAddPageLabelContainer" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+	background: transparent;
+	qproperty-alignment: AlignCenter;
+}</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Noto Sans KR</family>
+                  <pointsize>20</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>수행평가 일정 추가</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="testsAddPageInputContainer" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <property name="horizontalSpacing">
+               <number>50</number>
+              </property>
+              <property name="bottomMargin">
+               <number>9</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>이름</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="testsAddNameInput"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>설명</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QTextEdit" name="testsAddDescInput"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>과목</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="testsAddSubjectInput">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="editable">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>종료일</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDateEdit" name="testsAddDateInput">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QTimeEdit" name="testsAddTimeInput">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="calendarPopup">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="testsAddPageBtnContainer" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+	background-color: #a9cb6a;
+	border: 1px solid rgba(185, 185, 185, 100);
+	border-radius: 5px;
+	padding: 5px;
+}</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QPushButton" name="testsAddBtn">
+                <property name="text">
+                 <string>   일정 추가하기</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons.qrc">
+                  <normaloff>:/black/icons/feather-black/plus.svg</normaloff>:/black/icons/feather-black/plus.svg</iconset>
+                </property>
                </widget>
               </item>
              </layout>

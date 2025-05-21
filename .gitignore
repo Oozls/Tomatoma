@@ -1,2 +1,4 @@
 __pycache__/
 resources/userdata/
+resources/ui/icons/
+tests/

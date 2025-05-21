@@ -11,8 +11,8 @@ class Tests():
     def add(self, path, name, desc, startdate, enddate, subject): # 수행평가 추가
         # path는 수행평가 데이터 저장하는 폴더
 
-        print("Tomatoma(tests.py->Tests): add 함수 실행")
-        print(f"Tomatoma(tests.py->Tests): path:{path}")
+        print("Tomatoma (tests.py->Tests): add 함수 실행")
+        print(f"Tomatoma (tests.py->Tests): path={path}")
 
         data = OrderedDict()
         data['name'] = name

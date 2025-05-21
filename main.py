@@ -6,9 +6,11 @@
 # 라이브러리
 from PyQt5 import QtWidgets
 import sys, os
+import icons
 
 
 from ui import Ui
+
 
 
 # 나중에 pyinstaller로 .exe로 변환해서 실행하면 경로가 다르게 설정되는 거 보정해주는 코드 / 걍 무시하자
@@ -25,7 +27,7 @@ else:
 
 # 이 프로그램이 메인으로 실행되었을 때
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv) #뭔지 모름
     window = Ui(current_path) # ui.py 파일에 있는 클래스 Ui 실행
     app.exec_()
 

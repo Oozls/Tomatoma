@@ -2,7 +2,7 @@
 # 수행평가 추가 및 수정, 삭제 등 역할 맡음, 데이터는 .json 파일로 저장
 
 from collections import OrderedDict
-import os, json
+import os, json, time
 
 def add(path, name, desc, enddate, subject): # 수행평가 추가
     # path는 수행평가 데이터 저장하는 폴더
@@ -44,3 +44,14 @@ def lists(path):
     print(f"Tomatoma (tests.py): json_data_list={json_data_list}")
 
     return json_data_list
+
+def limitLists(theList):
+    result_list = theList
+    result_list.sort(key=lambda x: x['enddate'])
+
+    dummy_list = result_list.copy()
+    for i in range(len(result_list)):
+        if time.time() - result_list[i]['enddate'] >= 604800: dummy_list.pop(i)
+    result_list = dummy_list
+
+    return result_list

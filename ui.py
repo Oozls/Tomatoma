@@ -1,15 +1,15 @@
 # -*- coding:utf-8 -*-
-# PyQt5로 Ui 구동하는 코드임
+# PyQt5로 Ui 구동하는 코드임 (사실상 메인)
 
-from PyQt5 import QtWidgets, uic, sip
-from PyQt5.QtWidgets import QPushButton, QStackedWidget, QWidget, QDateEdit, QTimeEdit, QComboBox, QTextEdit, QLineEdit, QMessageBox, QGridLayout, QLabel, QSizePolicy
-from PyQt5.QtCore import Qt, QDate, QTime, QDateTime, QSize
+from PyQt5 import QtWidgets, uic, sip #sip는 어따 쓰는 거더라
+from PyQt5.QtWidgets import QPushButton, QStackedWidget, QWidget, QDateEdit, QTimeEdit, QComboBox, QTextEdit, QLineEdit, QMessageBox, QGridLayout, QLabel, QSizePolicy, QScrollArea, QVBoxLayout
+from PyQt5.QtCore import Qt, QDate, QTime, QDateTime, QSize, QPoint, QTimer
 from PyQt5.QtGui import QFont
 from datetime import datetime, timedelta
 import os, time
 
 # 기타 코드 클래스 임포트
-import tests, search
+import tests, search, alarm
 
 
 
@@ -18,7 +18,7 @@ class Ui(QtWidgets.QMainWindow):
         print("Tomatoma (ui.py->Ui): Ui 클래스 Init")
         super(Ui, self).__init__()
         uic.loadUi("./resources/ui/main.ui", self) # main.ui 불러오기
-
+        
 
         #변수 설정
         self.menuToggle = False
@@ -65,10 +65,25 @@ class Ui(QtWidgets.QMainWindow):
 
         self.path = path
         self.data_path = os.path.join(self.path, 'resources/userdata')
+        self.tests_alarm = {}
         self.testsUpdate()
+        self.oldPos = self.pos()
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.alarmCheck)
+        self.timer.start(1000)
 
 
-    def toggleMenu(self):
+    def mousePressEvent(self, event): # 이건 퍼옴, 드래그 가능한 창 
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint (event.globalPos() - self.oldPos)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
+
+
+    def toggleMenu(self): # 메뉴 크기 조절 함수 -> 버그 많아서 없앴음
         print('Tomatoma (ui.py->Ui): toggleMenu 함수 실행')
         if self.menuToggle:
             self.mainSidebar.setMaximumWidth(50)
@@ -82,7 +97,7 @@ class Ui(QtWidgets.QMainWindow):
         self.menuToggle = not self.menuToggle
 
     
-    def testAddSetup(self):
+    def testAddSetup(self): # 수행평가 일정 추가 시 입력 기본값 설정 함수
         print('Tomatoma (ui.py->Ui): testsAddSetup 함수 실행')
         # 텍스트 리셋
         self.testsAddNameInput.setText('')
@@ -92,7 +107,12 @@ class Ui(QtWidgets.QMainWindow):
         self.testsAddSubjectInput.addItem('국어')
         self.testsAddSubjectInput.addItem('영어')
         self.testsAddSubjectInput.addItem('수학')
+        self.testsAddSubjectInput.addItem('물리')
+        self.testsAddSubjectInput.addItem('화학')
+        self.testsAddSubjectInput.addItem('생명과학')
+        self.testsAddSubjectInput.addItem('지구과학')
         self.testsAddSubjectInput.addItem('정보과학')
+        # 문과 과목 뭐 있는지 몰라서 못 넣었습니다 + 교양
 
         self.testsAddDateInput.setDate(QDate.currentDate())
         self.testsAddTimeInput.setTime(QTime(0,0))
@@ -100,7 +120,7 @@ class Ui(QtWidgets.QMainWindow):
         self.mainContainer.setCurrentIndex(2) # 페이지 이름으로 넘기는 기능 왜 없냐
 
 
-    def testAdd(self):
+    def testAdd(self): # 진짜로 수행 일정 추가하는 일정
         print('Tomatoma (ui.py->Ui): testAdd 함수 실행')
         if self.testsAddNameInput.text().replace(' ','') == '':
             QMessageBox.about(self, "에러", "이름을 입력해주세요.")
@@ -125,17 +145,29 @@ class Ui(QtWidgets.QMainWindow):
         tests.add(self.data_path,name,desc,unixDateTime,subject)
         print('Tomatoma (ui.py->Ui): 수행평가 일정 생성 완료')
         self.testsUpdate()
+        self.testsSearchInput.setText('')
+        self.testsSearch()
         self.mainContainer.setCurrentIndex(1)
-        QMessageBox.about(self, "완료", "일정이 생성되었습니다.")
+        alarm.alarm("성공!", "일정이 생성되었습니다.")
 
 
-    def testsUpdate(self):
+    def testsUpdate(self): # tests 코드 통해서 파일 목록 불러오고 클래스 안에 저장하는 거
         print('Tomatoma (ui.py->Ui): testsUpdate 함수 실행')
         self.tests_list = tests.lists(self.data_path)
         print('Tomatoma (ui.py->Ui): 수행평가 일정 업데이트됨')
+        print(f'Tomatoma (ui.py->Ui): self.tests_list={self.tests_list}')
+        if len(self.tests_alarm) == 0:
+            for i in self.tests_list:
+                new_dict = {}
+                new_dict['day'] = False
+                new_dict['hour'] = False
+                new_dict['half'] = False
+                new_dict['min'] = False
+                self.tests_alarm[i['name']] = new_dict
 
 
-    def testsSearch(self):
+
+    def testsSearch(self): # 검색 출력하는 거임
         print('Tomatoma (ui.py->Ui): testsSearch 함수 실행')
 
         input_string = self.testsSearchInput.text()
@@ -146,6 +178,10 @@ class Ui(QtWidgets.QMainWindow):
             result_list = self.tests_list
         else:
             result_list = search.search(input_string, self.tests_list)
+        result_list.sort(key=lambda x: x['enddate'])
+
+        result_list = tests.limitLists(result_list)
+
         print(f'Tomatoma (ui.py->Ui): result_list={result_list}')
         
         for child in self.testsScrollAreaContainer.findChildren(QWidget):
@@ -164,8 +200,7 @@ class Ui(QtWidgets.QMainWindow):
         for i in result_list: #검색 결과 위젯 생성하는 거임 아니 왜 pyqt5 위젯 복사 지원 안 하냐
             widget = QWidget(self.testsScrollAreaContainer)
             widget.setParent(self.testsScrollAreaContainer)
-            widget.setStyleSheet('QWidget {background-color: #fefbfb;border-radius: 5px;border: 1px solid rgba(185, 185, 185, 100);}')
-            widget.setGeometry(10, y, self.testsScrollAreaContainer.width()-20, 150)
+            widget.setGeometry(10, y, self.testsScrollAreaContainer.width()-20, 200)
 
             layout = QGridLayout(widget)
             # QLabel: 이름
@@ -183,11 +218,28 @@ class Ui(QtWidgets.QMainWindow):
             layout.addWidget(subject, 0, 1)
 
             # QLabel: 설명
-            desc = QLabel("설명")
-            desc.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            desc.setMaximumSize(QSize(16777215, 100))
+            scrollArea = QScrollArea(self.testsScrollAreaContainer)
+            scrollArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            scrollArea.setMaximumSize(QSize(16777215, 100))
+            scrollArea.setStyleSheet('QScrollBar:vertical {width: 12px;background: #d3d88f;} QScrollBar:horizontal {width: 12px;background: #d3d88f;} QScrollBar::handle:vertical {border: none;border-radius: 5px;background-color: #a9cb6a;min-height: 30px;} QScrollBar::handle:horizontal {border: none;border-radius: 5px;background-color: #a9cb6a;min-height: 30px;} QScrollBar::add-line, QScrollBar::sub-line {background: transparent;}')
+            layout.addWidget(scrollArea, 1, 0)
+            
+            scrollArea.setWidgetResizable(True)
+
+            scrollWidget = QWidget(scrollArea)
+            scrollWidget.setStyleSheet('border-radius: 0px;')
+            scrollArea.setStyleSheet('background-color: #fefbfb; border: 0;')
+            scrollArea.setWidget(scrollWidget)
+
+            scrollLayout = QVBoxLayout(scrollWidget)
+            scrollLayout.setContentsMargins(0,0,0,0)
+
+            desc = QLabel(scrollWidget)
+            desc.setWordWrap(True)
             desc.setText(i['desc'])
-            layout.addWidget(desc, 1, 0)
+            if i['desc'].replace(' ','') == '': desc.setText("...")
+            desc.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+            scrollLayout.addWidget(desc)
 
             # QLabel: 시간
             dateTime = QLabel("날짜")
@@ -203,7 +255,10 @@ class Ui(QtWidgets.QMainWindow):
 
             if diff_seconds < 0:
                 leftTime.setText('이미 지난 수행이에요.')
+                widget.setStyleSheet('QWidget {background-color: #cfcfcf;border-radius: 5px;border: 1px solid rgba(185, 185, 185, 100);}')
+                scrollWidget.setStyleSheet('background-color: #cfcfcf; border: 0;')
             else:
+                widget.setStyleSheet('QWidget {background-color: #fefbfb;border-radius: 5px;border: 1px solid rgba(185, 185, 185, 100);}')
                 diff = timedelta(seconds=int(diff_seconds))
                 days = diff.days
                 hours = diff.seconds // 3600
@@ -211,7 +266,7 @@ class Ui(QtWidgets.QMainWindow):
                 seconds = diff.seconds % 60
 
                 if days > 0:
-                    leftTime.setText(f'{days}일 후')
+                    leftTime.setText(f'{days+1}일 후')
                 elif hours > 0:
                     leftTime.setText(f'{hours}시간 후')
                 elif minutes > 0:
@@ -223,6 +278,30 @@ class Ui(QtWidgets.QMainWindow):
 
             widget.show()
 
-            y+=160
+            y+=210
         
-        self.testsScrollAreaContainer.setMinimumSize(0,160*len(result_list)+10)
+        self.testsScrollAreaContainer.setMinimumSize(0,210*len(result_list)+10)
+
+
+    def alarmCheck(self): #전송
+        print('Tomatoma (ui.py->Ui): alarmCheck 함수 실행')
+        result_list = tests.limitLists(self.tests_list)
+        result_list.sort(key=lambda x: x['enddate'], reverse=True)
+        for i in result_list:
+            now = time.time()
+            if i['enddate'] - now <= 0: continue
+            elif i['enddate'] - now < 86400 and not self.tests_alarm[i['name']]['day']:
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 하루도 안 남았어요!')
+                self.tests_alarm[i['name']]['day'] = True
+            elif i['enddate'] - now < 3600 and not self.tests_alarm[i['name']]['hour']:
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 한 시간도 안 남았어요!!')
+                self.tests_alarm[i['name']]['hour'] = True
+            elif i['enddate'] - now < 1800 and not self.tests_alarm[i['name']]['half']:
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 30분도 안 남았어요!!!')
+                self.tests_alarm[i['name']]['half'] = True
+            elif i['enddate'] - now < 60 and not self.tests_alarm[i['name']]['min']:
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 1분도 안 남았어요!!!!')
+                self.tests_alarm[i['name']]['min'] = True
+
+
+# GPT 안 썻어요 진짜임

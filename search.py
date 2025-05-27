@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from jamo import h2j, j2hcj
 import difflib, os
 

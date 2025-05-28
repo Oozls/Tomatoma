@@ -323,7 +323,7 @@ QPushButton::hover {
 }</string>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="homePage">
           <property name="styleSheet">
@@ -394,7 +394,7 @@ QPushButton::hover {
            <item>
             <widget class="QLabel" name="label_12">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;옆의 문서 버튼을 통해 등록해둔 수행평가 목록을 볼 수 있습니다.&lt;/p&gt;&lt;p&gt;이미 지난 수행평가는 회색으로, 끝나지 않은 수행평가는 남은 시간과 함께 흰색으로 나타납니다.&lt;/p&gt;&lt;p&gt;수행평가 목록 화면에서는 검색이 가능하며, 검색창 옆 버튼을 통해 수행평가 일정을 추가할 수 있습니다.&lt;/p&gt;&lt;p&gt;일주일이 지난 수행평가는 자동으로 삭제됩니다. (데이터로는 남습니다)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;옆의 문서 버튼을 통해 등록해둔 수행평가 목록을 볼 수 있습니다.&lt;br/&gt;이미 지난 수행평가는 회색으로, 끝나지 않은 수행평가는 남은 시간과 함께 흰색으로 나타납니다.&lt;br/&gt;수행평가 목록 화면에서는 검색이 가능하며, 검색창 옆 버튼을 통해 수행평가 일정을 추가할 수 있습니다.&lt;br/&gt;일주일이 지난 수행평가는 자동으로 삭제됩니다. (데이터로는 남습니다)&lt;/p&gt;&lt;p&gt;직접 수행평가 일정 데이터를 편집 및 삭제하고 싶으면 resources/userdata 내부의 .json 파일을 수정하시면 됩니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -660,7 +660,7 @@ QScrollBar::add-line, QScrollBar::sub-line {
                       <property name="geometry">
                        <rect>
                         <x>0</x>
-                        <y>-488</y>
+                        <y>0</y>
                         <width>744</width>
                         <height>1000</height>
                        </rect>

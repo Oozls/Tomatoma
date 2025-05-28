@@ -22,12 +22,18 @@ class Ui(QtWidgets.QMainWindow):
 
         #변수 설정
         self.menuToggle = False
+        self.drag_position = None
 
 
         #요소 지정
+        self.mainTop = self.findChild(QWidget, 'mainTop')
         self.mainContainer = self.findChild(QStackedWidget, 'mainContainer')
         self.mainContainer.setCurrentIndex(0)
         self.mainSidebar = self.findChild(QWidget, 'mainSidebar')
+
+        self.mainTop.mousePressEvent = self.title_mouse_press
+        self.mainTop.mouseMoveEvent = self.title_mouse_move
+        self.mainTop.mouseReleaseEvent = self.title_mouse_release
 
         self.menuBtn = self.findChild(QPushButton, 'menuBtn')
         self.homeBtn = self.findChild(QPushButton, 'homeBtn')
@@ -35,6 +41,7 @@ class Ui(QtWidgets.QMainWindow):
         self.closeBtn = self.findChild(QPushButton, 'closeBtn')
 
         self.testsSearchInput = self.findChild(QLineEdit, 'testsSearchInput')
+        self.testsScrollArea = self.findChild(QScrollArea, 'testsScrollArea')
         self.testsScrollAreaContainer = self.findChild(QWidget, 'testsScrollAreaContainer')
         self.testsSearchSample = self.findChild(QWidget, 'testsSearchSample')
         self.testsSearchSample.hide()
@@ -74,27 +81,42 @@ class Ui(QtWidgets.QMainWindow):
         self.timer.start(1000)
 
 
-    def mousePressEvent(self, event): # 이건 퍼옴, 드래그 가능한 창 
-        self.oldPos = event.globalPos()
+    def title_mouse_press(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
 
-    def mouseMoveEvent(self, event):
-        delta = QPoint (event.globalPos() - self.oldPos)
-        self.move(self.x() + delta.x(), self.y() + delta.y())
-        self.oldPos = event.globalPos()
+    def title_mouse_move(self, event):
+        if event.buttons() & Qt.LeftButton and self.drag_position:
+            self.move(event.globalPos() - self.drag_position)
+            event.accept()
+
+    def title_mouse_release(self, event):
+        self.drag_position = None
+        event.accept()
 
 
-    def toggleMenu(self): # 메뉴 크기 조절 함수 -> 버그 많아서 없앴음
-        print('Tomatoma (ui.py->Ui): toggleMenu 함수 실행')
-        if self.menuToggle:
-            self.mainSidebar.setMaximumWidth(50)
-            for child in self.testsScrollAreaContainer.findChildren(QWidget):
-                child.show()
-        else:
-            self.mainSidebar.setMaximumWidth(200)
-            for child in self.testsScrollAreaContainer.findChildren(QWidget):
-                child.hide()
+    # def TopMousePressEvent(self, event): # 이건 퍼옴, 드래그 가능한 창
+    #     self.oldPos = event.globalPos()
 
-        self.menuToggle = not self.menuToggle
+    # def TopMouseMoveEvent(self, event):
+    #     delta = QPoint (event.globalPos() - self.oldPos)
+    #     self.move(self.x() + delta.x(), self.y() + delta.y())
+    #     self.oldPos = event.globalPos()
+
+
+    # def toggleMenu(self): # 메뉴 크기 조절 함수 -> 버그 많아서 없앴음
+    #     print('Tomatoma (ui.py->Ui): toggleMenu 함수 실행')
+    #     if self.menuToggle:
+    #         self.mainSidebar.setMaximumWidth(50)
+    #         for child in self.testsScrollAreaContainer.findChildren(QWidget):
+    #             child.show()
+    #     else:
+    #         self.mainSidebar.setMaximumWidth(200)
+    #         for child in self.testsScrollAreaContainer.findChildren(QWidget):
+    #             child.hide()
+
+    #     self.menuToggle = not self.menuToggle
 
     
     def testAddSetup(self): # 수행평가 일정 추가 시 입력 기본값 설정 함수
@@ -143,12 +165,20 @@ class Ui(QtWidgets.QMainWindow):
         print(f'Tomatoma (ui.py->Ui): dateTime={time.mktime(dateTime.timetuple())}')
 
         tests.add(self.data_path,name,desc,unixDateTime,subject)
+
+        new_dict = {}
+        new_dict['day'] = False
+        new_dict['hour'] = False
+        new_dict['half'] = False
+        new_dict['min'] = False
+        self.tests_alarm[name] = new_dict
+
         print('Tomatoma (ui.py->Ui): 수행평가 일정 생성 완료')
         self.testsUpdate()
         self.testsSearchInput.setText('')
         self.testsSearch()
         self.mainContainer.setCurrentIndex(1)
-        alarm.alarm("성공!", "일정이 생성되었습니다.")
+        alarm.alarm("성공!", "일정이 생성되었습니다.", self.path)
 
 
     def testsUpdate(self): # tests 코드 통해서 파일 목록 불러오고 클래스 안에 저장하는 거
@@ -197,10 +227,12 @@ class Ui(QtWidgets.QMainWindow):
             return font
 
         y = 10
+        if len(result_list) >= 3: width = self.testsScrollArea.width()-12
+        else: width = self.testsScrollArea.width()
         for i in result_list: #검색 결과 위젯 생성하는 거임 아니 왜 pyqt5 위젯 복사 지원 안 하냐
             widget = QWidget(self.testsScrollAreaContainer)
             widget.setParent(self.testsScrollAreaContainer)
-            widget.setGeometry(10, y, self.testsScrollAreaContainer.width()-20, 200)
+            widget.setGeometry(10, y, width-20, 200)
 
             layout = QGridLayout(widget)
             # QLabel: 이름
@@ -214,6 +246,7 @@ class Ui(QtWidgets.QMainWindow):
             subject = QLabel("과목")
             subject.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
             subject.setFont(_make_font(bold=True))
+            subject.setStyleSheet('QLabel {qproperty-alignment: AlignCenter}')
             subject.setText(i['subject'])
             layout.addWidget(subject, 0, 1)
 
@@ -249,6 +282,7 @@ class Ui(QtWidgets.QMainWindow):
 
             # QLabel: 남은 시간
             leftTime = QLabel("남은 시간")
+            leftTime.setStyleSheet('QLabel {qproperty-alignment: AlignCenter, margin: 10px 0 10px 0}')
 
             now = time.time()
             diff_seconds = i['enddate'] - now
@@ -279,7 +313,6 @@ class Ui(QtWidgets.QMainWindow):
             widget.show()
 
             y+=210
-        
         self.testsScrollAreaContainer.setMinimumSize(0,210*len(result_list)+10)
 
 
@@ -291,17 +324,17 @@ class Ui(QtWidgets.QMainWindow):
             now = time.time()
             if i['enddate'] - now <= 0: continue
             elif i['enddate'] - now < 86400 and not self.tests_alarm[i['name']]['day']:
-                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 하루도 안 남았어요!')
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 하루도 안 남았어요!', self.path)
                 self.tests_alarm[i['name']]['day'] = True
             elif i['enddate'] - now < 3600 and not self.tests_alarm[i['name']]['hour']:
-                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 한 시간도 안 남았어요!!')
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 한 시간도 안 남았어요!!', self.path)
                 self.tests_alarm[i['name']]['hour'] = True
             elif i['enddate'] - now < 1800 and not self.tests_alarm[i['name']]['half']:
-                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 30분도 안 남았어요!!!')
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 30분도 안 남았어요!!!', self.path)
                 self.tests_alarm[i['name']]['half'] = True
             elif i['enddate'] - now < 60 and not self.tests_alarm[i['name']]['min']:
-                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 1분도 안 남았어요!!!!')
+                alarm.alarm('Tomatoma가 알려드려요.', f'"{i['name']}({i['subject']})" (이)가 1분도 안 남았어요!!!!', self.path)
                 self.tests_alarm[i['name']]['min'] = True
 
 
-# GPT 안 썻어요 진짜임
+# GPT 안 썻어요 진짜 (창 드래그 빼고)

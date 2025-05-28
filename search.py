@@ -41,7 +41,7 @@ import hgtk
 import difflib
 
 def search(answer_string, tests_list):
-    print(f'Tomatoma (search.py): search 함수 실행')
+    # print(f'Tomatoma (search.py): search 함수 실행')
 
     result_list = []
 

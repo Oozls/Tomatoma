@@ -3,8 +3,8 @@
 
 from PyQt5 import QtWidgets, uic, sip #sip는 어따 쓰는 거더라
 from PyQt5.QtWidgets import QPushButton, QStackedWidget, QWidget, QDateEdit, QTimeEdit, QComboBox, QTextEdit, QLineEdit, QMessageBox, QGridLayout, QLabel, QSizePolicy, QScrollArea, QVBoxLayout
-from PyQt5.QtCore import Qt, QDate, QTime, QDateTime, QSize, QPoint, QTimer
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QDate, QTime, QDateTime, QSize, QTimer
+from PyQt5.QtGui import QFont, QIcon
 from datetime import datetime, timedelta
 import os, time
 
@@ -15,7 +15,7 @@ import tests, search, alarm
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, path): # 초기 실행
-        print("Tomatoma (ui.py->Ui): Ui 클래스 Init")
+        # print("Tomatoma (ui.py->Ui): Ui 클래스 Init")
         super(Ui, self).__init__()
         uic.loadUi("./resources/ui/main.ui", self) # main.ui 불러오기
         
@@ -68,6 +68,7 @@ class Ui(QtWidgets.QMainWindow):
 
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setWindowIcon(QIcon(os.path.join(path,'resources/ui/tomato.ico')))
         self.show() # 불러온 ui 보여주기
 
         self.path = path
@@ -120,7 +121,7 @@ class Ui(QtWidgets.QMainWindow):
 
     
     def testAddSetup(self): # 수행평가 일정 추가 시 입력 기본값 설정 함수
-        print('Tomatoma (ui.py->Ui): testsAddSetup 함수 실행')
+        # print('Tomatoma (ui.py->Ui): testsAddSetup 함수 실행')
         # 텍스트 리셋
         self.testsAddNameInput.setText('')
         self.testsAddDescInput.setText('')
@@ -143,10 +144,10 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def testAdd(self): # 진짜로 수행 일정 추가하는 일정
-        print('Tomatoma (ui.py->Ui): testAdd 함수 실행')
+        # print('Tomatoma (ui.py->Ui): testAdd 함수 실행')
         if self.testsAddNameInput.text().replace(' ','') == '':
             QMessageBox.about(self, "에러", "이름을 입력해주세요.")
-            print('Tomatoma (ui.py->Ui): 이름 미입력')
+            # print('Tomatoma (ui.py->Ui): 이름 미입력')
             return
         
         name = self.testsAddNameInput.text()
@@ -157,12 +158,12 @@ class Ui(QtWidgets.QMainWindow):
         dateTime = QDateTime(date, timeI).toPyDateTime()
         unixDateTime = time.mktime(dateTime.timetuple())
         
-        print(f'Tomatoma (ui.py->Ui): name={name}')
-        print(f'Tomatoma (ui.py->Ui): desc={desc}')
-        print(f'Tomatoma (ui.py->Ui): subject={subject}')
-        print(f'Tomatoma (ui.py->Ui): date={date}')
-        print(f'Tomatoma (ui.py->Ui): timeI={timeI}')
-        print(f'Tomatoma (ui.py->Ui): dateTime={time.mktime(dateTime.timetuple())}')
+        # print(f'Tomatoma (ui.py->Ui): name={name}')
+        # print(f'Tomatoma (ui.py->Ui): desc={desc}')
+        # print(f'Tomatoma (ui.py->Ui): subject={subject}')
+        # print(f'Tomatoma (ui.py->Ui): date={date}')
+        # print(f'Tomatoma (ui.py->Ui): timeI={timeI}')
+        # print(f'Tomatoma (ui.py->Ui): dateTime={time.mktime(dateTime.timetuple())}')
 
         tests.add(self.data_path,name,desc,unixDateTime,subject)
 
@@ -173,7 +174,7 @@ class Ui(QtWidgets.QMainWindow):
         new_dict['min'] = False
         self.tests_alarm[name] = new_dict
 
-        print('Tomatoma (ui.py->Ui): 수행평가 일정 생성 완료')
+        # print('Tomatoma (ui.py->Ui): 수행평가 일정 생성 완료')
         self.testsUpdate()
         self.testsSearchInput.setText('')
         self.testsSearch()
@@ -182,10 +183,10 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def testsUpdate(self): # tests 코드 통해서 파일 목록 불러오고 클래스 안에 저장하는 거
-        print('Tomatoma (ui.py->Ui): testsUpdate 함수 실행')
+        # print('Tomatoma (ui.py->Ui): testsUpdate 함수 실행')
         self.tests_list = tests.lists(self.data_path)
-        print('Tomatoma (ui.py->Ui): 수행평가 일정 업데이트됨')
-        print(f'Tomatoma (ui.py->Ui): self.tests_list={self.tests_list}')
+        # print('Tomatoma (ui.py->Ui): 수행평가 일정 업데이트됨')
+        # print(f'Tomatoma (ui.py->Ui): self.tests_list={self.tests_list}')
         if len(self.tests_alarm) == 0:
             for i in self.tests_list:
                 new_dict = {}
@@ -198,10 +199,10 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def testsSearch(self): # 검색 출력하는 거임
-        print('Tomatoma (ui.py->Ui): testsSearch 함수 실행')
+        # print('Tomatoma (ui.py->Ui): testsSearch 함수 실행')
 
         input_string = self.testsSearchInput.text()
-        print(f'Tomatoma (ui.py->Ui): input_string={input_string}')
+        # print(f'Tomatoma (ui.py->Ui): input_string={input_string}')
 
         result_list = []
         if input_string == '':
@@ -212,7 +213,7 @@ class Ui(QtWidgets.QMainWindow):
 
         result_list = tests.limitLists(result_list)
 
-        print(f'Tomatoma (ui.py->Ui): result_list={result_list}')
+        # print(f'Tomatoma (ui.py->Ui): result_list={result_list}')
         
         for child in self.testsScrollAreaContainer.findChildren(QWidget):
             child.setParent(None)
@@ -317,7 +318,7 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def alarmCheck(self): #전송
-        print('Tomatoma (ui.py->Ui): alarmCheck 함수 실행')
+        # print('Tomatoma (ui.py->Ui): alarmCheck 함수 실행')
         result_list = tests.limitLists(self.tests_list)
         result_list.sort(key=lambda x: x['enddate'], reverse=True)
         for i in result_list:

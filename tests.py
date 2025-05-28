@@ -8,8 +8,8 @@ def add(path, name, desc, enddate, subject): # 수행평가 추가
     # path는 수행평가 데이터 저장하는 폴더
     if not os.path.exists(path): os.mkdir(path)
 
-    print("Tomatoma (tests.py): add 함수 실행")
-    print(f"Tomatoma (tests.py): path={path}")
+    # print("Tomatoma (tests.py): add 함수 실행")
+    # print(f"Tomatoma (tests.py): path={path}")
 
     data = OrderedDict()
     data['name'] = name
@@ -23,8 +23,8 @@ def add(path, name, desc, enddate, subject): # 수행평가 추가
 def lists(path):
     if not os.path.exists(path): os.mkdir(path)
 
-    print("Tomatoma (tests.py): lists 함수 실행")
-    print(f"Tomatoma (tests.py): path={path}")
+    # print("Tomatoma (tests.py): lists 함수 실행")
+    # print(f"Tomatoma (tests.py): path={path}")
 
     json_data_list = []
 
@@ -41,7 +41,7 @@ def lists(path):
             except Exception as e:
                 print(f"Tomatoma (tests.py): 파일 읽기 오류: {filename} - {e}")
     
-    print(f"Tomatoma (tests.py): json_data_list={json_data_list}")
+    # print(f"Tomatoma (tests.py): json_data_list={json_data_list}")
 
     return json_data_list
 

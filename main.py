@@ -33,4 +33,4 @@ if __name__ == "__main__":
 
     # 여기 뒤로는 Ui 닫아야 실행됨.
 
-    print("Tomatoma: Ui 닫힘")
+    # print("Tomatoma: Ui 닫힘")
